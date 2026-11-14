@@ -477,6 +477,19 @@ void UAssetManager::CreateParticleMaterial()
 	RegisterAsset("SubUVMaterial", ParticleMat);
 }
 
+void UAssetManager::CreateParticleSpriteMaterial()
+{
+	UMaterial* ParticleMat = NewObject<UMaterial>();
+	ParticleMat->PSOType = EPSOType::ParticleSprite_AlphaBlend;
+	ParticleMat->Shader = FRenderResourceManager::GetShaderProgram("Resources/Shader/ParticleSpriteShader.hlsl");
+	ParticleMat->Textures.Add(GetAssetByPath<UTexture2D>("Engine/SubUV/StarParticle.png"));
+	ParticleMat->BlendState = EBlendState::AlphaBlend;
+	ParticleMat->DepthStencilState = EDepthStencilState::ReadOnly;
+	ParticleMat->ParamLayout = EMaterialParamLayout::None;
+	ParticleMat->ParamBuffer = RenderCommand::CreateConstantBuffer(256);
+	RegisterAsset("SubUVMaterial", ParticleMat);
+}
+
 void UAssetManager::CreateEditorArrowMaterial() {
 	UMaterial* BaseMaterial{ GetAssetByPath<UMaterial>("DefaultMaterial") };
 	UMaterial* ArrowMaterial{ UMaterial::CreateInstance(BaseMaterial) };

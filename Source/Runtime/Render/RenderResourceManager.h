@@ -11,6 +11,7 @@ enum class EPSOType : uint8
 	StaticMesh_Wireframe,    
 	Particle_AlphaBlend,     
 	Particle_Additive,       
+	ParticleSprite_AlphaBlend,
 	Skybox,                  
 	Grid,                    
 	Outline_Mask,            
