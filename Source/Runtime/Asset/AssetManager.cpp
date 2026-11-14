@@ -188,6 +188,7 @@ void UAssetManager::Init(const FAssetLoadProgress& OnProgress)
 	Get().CreateDefaultMeshes();
 	Get().CreateBillboardMaterial();
 	Get().CreateParticleMaterial();
+	Get().CreateParticleSpriteMaterial();
 	Get().CreateEditorArrowMaterial();
 }
 
@@ -487,7 +488,7 @@ void UAssetManager::CreateParticleSpriteMaterial()
 	ParticleMat->DepthStencilState = EDepthStencilState::ReadOnly;
 	ParticleMat->ParamLayout = EMaterialParamLayout::None;
 	ParticleMat->ParamBuffer = RenderCommand::CreateConstantBuffer(256);
-	RegisterAsset("SubUVMaterial", ParticleMat);
+	RegisterAsset("ParticleSpriteMaterial", ParticleMat);
 }
 
 void UAssetManager::CreateEditorArrowMaterial() {
