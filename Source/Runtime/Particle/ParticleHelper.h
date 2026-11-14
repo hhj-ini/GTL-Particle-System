@@ -16,6 +16,9 @@ struct FBaseParticle
 	FLinearColor Color;
 };
 
+// 16 배수로 맞춰줘야 함.
+static_assert(sizeof(FBaseParticle) % 16 == 0);
+
 struct FParticleDataContainer
 {
 	int32 MemBlockSize;
@@ -30,10 +33,13 @@ struct FParticleSpriteVertex
 {
 	FVector Position;
 	float ReleativeTime;
+	FVector2 Size;
+	float Rotation;
+	float SubImageIndex;
+	FVector4 Color;
 };
 
-// 16 배수로 맞춰줘야 함.
-static_assert(sizeof(FBaseParticle) % 16 == 0);
+static_assert(sizeof(FParticleSpriteVertex) == 48);
 
 #define DECLARE_PARTICLE_PTR(Name, Address)		\
 	FBaseParticle* Name = (FBaseParticle*) (Address);
