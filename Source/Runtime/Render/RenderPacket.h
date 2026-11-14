@@ -20,6 +20,7 @@ struct FRenderPacket
 	UStaticMesh* Mesh = nullptr; // static
 	FVertexBuffer* VertexBuffer = nullptr; // dynamic
 	FIndexBuffer* IndexBuffer= nullptr; // dynamic
+	FVertexBuffer* InstanceBuffer = nullptr; // 슬롯 1, 인스턴스 마다 한 칸
 	const FStructuredBuffer* BoneBuffer = nullptr; // GPU 스킨
 
 	UMaterial* Material = nullptr;
@@ -28,6 +29,7 @@ struct FRenderPacket
 	uint32 MaterialParamDataSize = 0;
 	uint32 StartIndex = 0;
 	uint32 IndexCount = 0; // 0이면 인덱스 버퍼 전체를 사용한다
+	uint32 InstanceCount = 0; // 0이면 인스턴싱 하지 않는다.
 	uint32 Slot = InvalidObjectSlot;
 	uint8 LODIndex = 0;
 	bool bOccludedByGpu = false;

@@ -133,14 +133,16 @@ void FVertexShader::InputLayoutReflection(ID3D11Device* Device, const FShaderByt
 		const DXGI_FORMAT Format = ToFormat(ParamDesc.Mask, ParamDesc.ComponentType);
 		if (Format == DXGI_FORMAT_UNKNOWN) continue;
 
+		const bool bInstance = std::strncmp(ParamDesc.SemanticName, "INST_", 5) == 0;
+
 		D3D11_INPUT_ELEMENT_DESC ElementDesc;
 		ElementDesc.SemanticName = ParamDesc.SemanticName;
 		ElementDesc.SemanticIndex = ParamDesc.SemanticIndex;
 		ElementDesc.Format = Format;
-		ElementDesc.InputSlot = 0;
+		ElementDesc.InputSlot = bInstance ? 1 : 0;
 		ElementDesc.AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-		ElementDesc.InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-		ElementDesc.InstanceDataStepRate = 0;
+		ElementDesc.InputSlotClass = bInstance ? D3D11_INPUT_PER_INSTANCE_DATA : D3D11_INPUT_PER_VERTEX_DATA;
+		ElementDesc.InstanceDataStepRate = bInstance ? 1 : 0;
 
 		InputLayoutDesc.Add(ElementDesc);
 	}

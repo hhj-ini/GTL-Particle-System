@@ -33,6 +33,7 @@ struct FMeshDrawBatch
 		uint32 ObjectSlot = InvalidObjectSlot;
 		uint32 StartIndex = 0;
 		uint32 IndexCount = 0;
+		uint32 InstanceCount = 0;
 		const void* ObjectKey = nullptr;
 		bool bOccludedByGpu = false;
 		bool bReceivesDecals = true;
@@ -44,6 +45,7 @@ struct FMeshDrawBatch
 
 	FVertexBuffer* VertexBuffer = nullptr;
 	FIndexBuffer* IndexBuffer = nullptr;
+	FVertexBuffer* InstanceBuffer = nullptr;
 	const FStructuredBuffer* BoneBuffer = nullptr;
 
 	TArray<FTextureBinding> Textures;

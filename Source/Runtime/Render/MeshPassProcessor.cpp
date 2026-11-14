@@ -267,6 +267,9 @@ bool FMeshPassProcessor::Build(const FSceneView& View, const FRenderQueue& Queue
 			!Packet.Proxy || Packet.Proxy->bReceivesDecals,
 			Packet.Proxy ? Packet.Proxy->GetBounds() : ConservativeBounds, Packet.Proxy));
 
+		Batch.InstanceBuffer = Packet.InstanceBuffer;
+		Batch.Items.Last().InstanceCount = Packet.InstanceBuffer ? Packet.InstanceCount : 0;
+
 		// 웨이트 히트맵: Forward 패스의 오브젝트 상수 빈 칸(ShadowFlags.y)에 본 번호 + 1을 싣는다
 		if (Pass == EMeshPassType::Forward && Packet.DebugWeightBone >= 0)
 		{
