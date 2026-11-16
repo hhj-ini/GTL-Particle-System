@@ -1,5 +1,5 @@
 #include "EnginePCH.h"
-#include "ParticleEmitterInstance.h"
+#include "ParticleEmitterInstances.h"
 #include "ParticleEmitter.h"
 #include "ParticleLODLevel.h"
 #include "Modules/ParticleModule.h"

@@ -25,7 +25,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	bool bEnabled = true;
 
-private:
 	bool bSpawnModule = false;
 	bool bUpdateModule = false;
 };

@@ -63,3 +63,8 @@ protected:
 	
 
 };
+
+struct FParticleSpriteEmitterInstance : public FParticleEmitterInstance
+{
+	// 4단계에서 GetDynamicData()가 여기에 추가된다
+};

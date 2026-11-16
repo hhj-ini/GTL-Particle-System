@@ -26,6 +26,8 @@ public:
 	UParticleSystemComponent();
 	virtual ~UParticleSystemComponent() override;
 
+	virtual void TickComponent(float DeltaTime) override;
+
 	virtual void SubmitToRenderQueue(FRenderQueue& RenderQueue, const FViewContext& ViewContext) override;
 
 	virtual int32 GetNumMaterials() const override { return 1; }
@@ -40,23 +42,32 @@ public:
 
 	virtual FBox CalcLocalBounds() const override;
 
-private:
-	bool EnsureInstanceBuffer(uint32 RequiredCount);
+	void SetTemplate(UParticleSystem* NewTemplate);
+	UParticleSystem* GetTemplate() const { return Template; }
+	void InitializeSystem();
 
-	void BuildTestInstances(TArray<FParticleSpriteVertex>& OutInstances) const;
+private:
+	void ClearEmitterInstances();
+	void BuildSpriteInstances(const FParticleEmitterInstance& Instance, TArray<FParticleSpriteVertex>& OutInstances) const;
+
+	struct FEmitterGpuBuffer
+	{
+		TUniquePtr<FVertexBuffer> Buffer;
+		uint32 Capacity = 0;
+	};
+	
+	static bool EnsureInstanceBuffer(FEmitterGpuBuffer& GpuBuffer, uint32 RequiredCount);
+
 
 private:
 	UStaticMesh* QuadMesh = nullptr;
 	UMaterial* Material = nullptr;
 
-	TUniquePtr<FVertexBuffer> InstanceBuffer;
-	uint32 InstanceCapacity = 0;
-	TArray<FParticleSpriteVertex> InstanceData;
+	UParticleSystem* Template = nullptr;
 
-
-	//UPROPERTY()
-	//UParticleSystem* Template = nullptr;
-
-	TArray<FParticleEmitterInstance*> EmitterInstance;
+	TArray<FParticleEmitterInstance*> EmitterInstances;
 	TArray<FDynamicEmitterDataBase*> EmitterRenderData;
+
+	std::vector<FEmitterGpuBuffer> EmitterBuffers;
+	TArray<FParticleSpriteVertex> InstanceData;
 };
