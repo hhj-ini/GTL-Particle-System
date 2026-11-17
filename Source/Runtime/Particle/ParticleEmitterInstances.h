@@ -5,6 +5,9 @@ class UParticleEmitter;
 class UParticleLODLevel;
 class UParticleModule;
 class UParticleSystemComponent;
+struct FDynamicEmitterDataBase;
+struct FDynamicEmitterReplayDataBase;
+struct FBox;
 
 struct FParticleEmitterInstance
 {
@@ -28,6 +31,10 @@ struct FParticleEmitterInstance
 		return reinterpret_cast<const FBaseParticle*>(ParticleData + ParticleStride * ParticleIndices[ActiveIndex]);
 	}
 
+	// 렌더용 다이나믹 데이터 새로 만듦. override 하기
+	virtual FDynamicEmitterDataBase* GetDynamicData(bool bSelected) { return nullptr; }
+	// 활성 파티클을 감싸는 월드 AABB. 파티클이 없으면 false
+	bool GetParticleBounds(FBox& OutBounds) const;
 
 
 	UParticleEmitter* SpriteTemplate = nullptr;
@@ -61,10 +68,10 @@ protected:
 	virtual void PreSpawn(FBaseParticle* Particle, const FVector& InitialLocation, const FVector& InitialVelocity);
 	virtual void PostSpawn(FBaseParticle* Particle, float Interp, float SpawnTime);
 	
-
+	bool FillReplayData(FDynamicEmitterReplayDataBase& OutData) const;
 };
 
 struct FParticleSpriteEmitterInstance : public FParticleEmitterInstance
 {
-	// 4단계에서 GetDynamicData()가 여기에 추가된다
+	FDynamicEmitterDataBase* GetDynamicData(bool bSelected) override;
 };

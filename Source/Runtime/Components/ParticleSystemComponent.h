@@ -46,6 +46,8 @@ public:
 	UParticleSystem* GetTemplate() const { return Template; }
 	void InitializeSystem();
 
+	UStaticMesh* GetQuadMesh() const { return QuadMesh; }
+
 private:
 	void ClearEmitterInstances();
 	void BuildSpriteInstances(const FParticleEmitterInstance& Instance, TArray<FParticleSpriteVertex>& OutInstances) const;

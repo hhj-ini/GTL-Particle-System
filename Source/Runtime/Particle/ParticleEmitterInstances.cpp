@@ -6,8 +6,11 @@
 #include "Modules/ParticleModuleSpawn.h"
 #include "Modules/ParticleModuleRequired.h"
 #include "Components/ParticleSystemComponent.h"
+#include "ParticleDynamicData.h"
 #include <malloc.h>
 #include <cstring>
+#include <cmath>
+#include <cfloat>
 
 namespace
 {
@@ -224,4 +227,68 @@ void FParticleEmitterInstance::PostSpawn(FBaseParticle* Particle, float Interp, 
 	// 프레임 도중에 태어났으면 그만큼 나이와 위치를 앞당긴다
 	Particle->RelativeTime = SpawnTime / Particle->LifeTime;
 	Particle->Location += Particle->Velocity * SpawnTime;
+}
+
+bool FParticleEmitterInstance::FillReplayData(FDynamicEmitterReplayDataBase& OutData) const
+{
+	if (ActiveParticles <= 0 || !ParticleData) return false;
+
+	OutData.ActiveParticleCount = ActiveParticles;
+	OutData.ParticleStride = ParticleStride;
+	OutData.DataContainer.Alloc(ActiveParticles * ParticleStride, ActiveParticles);
+	if (!OutData.DataContainer.ParticleData) return false;
+
+	for (int32 i = 0; i < ActiveParticles; ++i)
+	{
+		std::memcpy(OutData.DataContainer.ParticleData + i * ParticleStride,
+			ParticleData + ParticleIndices[i] * ParticleStride,
+			static_cast<size_t>(ParticleStride));
+		OutData.DataContainer.ParticleIndices[i] = static_cast<uint16>(i);
+	}
+	return true;
+}
+
+bool FParticleEmitterInstance::GetParticleBounds(FBox& OutBounds) const
+{
+	if (ActiveParticles <= 0 || !ParticleData) return false;
+
+	FVector Min(FLT_MAX, FLT_MAX, FLT_MAX);
+	FVector Max(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+	for (int32 i = 0; i < ActiveParticles; ++i)
+	{
+		const FBaseParticle& Particle = *GetParticle(i);
+		// 회전해도 쿼드가 들어가도록 반 대각선 길이를 반지름으로 쓴다
+		const float Radius = 0.5f * std::sqrt(Particle.Size.X * Particle.Size.X + Particle.Size.Y * Particle.Size.Y);
+
+		Min.X = FMath::Min(Min.X, Particle.Location.X - Radius);
+		Min.Y = FMath::Min(Min.Y, Particle.Location.Y - Radius);
+		Min.Z = FMath::Min(Min.Z, Particle.Location.Z - Radius);
+		Max.X = FMath::Max(Max.X, Particle.Location.X + Radius);
+		Max.Y = FMath::Max(Max.Y, Particle.Location.Y + Radius);
+		Max.Z = FMath::Max(Max.Z, Particle.Location.Z + Radius);
+	}
+	OutBounds = FBox{ Min, Max };
+	return true;
+}
+
+FDynamicEmitterDataBase* FParticleSpriteEmitterInstance::GetDynamicData(bool /*bSelected*/)
+{
+	if (!CurrentLODLevel || ActiveParticles <= 0) return nullptr;
+
+	FDynamicSpriteEmitterData* Data = new FDynamicSpriteEmitterData();
+	if (!FillReplayData(Data->Source))
+	{
+		delete Data;
+		return nullptr;
+	}
+
+	Data->Source.EmitterType = EDynamicEmitterType::Sprite;
+	if (const UParticleModuleRequired* Required = CurrentLODLevel->RequiredModule)
+	{
+		Data->Source.Material = Required->Material;
+		Data->Source.SubImagesHorizontal = Required->SubImagesHorizontal;
+		Data->Source.SubImagesVertical = Required->SubImagesVertical;
+	}
+	Data->bValid = true;
+	return Data;
 }
