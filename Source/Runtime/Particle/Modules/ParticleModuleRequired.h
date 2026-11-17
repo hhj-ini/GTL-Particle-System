@@ -18,7 +18,7 @@ public:
 	float EmitterDuration = 0.0f;
 
 	UPROPERTY(EditAnywhere)
-	int32 SubImageHorizontal = 1;
+	int32 SubImagesHorizontal = 1;
 	UPROPERTY(EditAnywhere)
-	int32 SubImagesVerticla = 1;
+	int32 SubImagesVertical = 1;
 };
