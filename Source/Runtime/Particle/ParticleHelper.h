@@ -2,6 +2,8 @@
 #include "Math/Vector.h"
 #include "Math/Color.h"
 #include <random>
+#include <malloc.h>
+#include <cstring>
 
 // CPU 시뮬레이션 데이터
 struct FBaseParticle
@@ -27,6 +29,33 @@ struct FParticleDataContainer
 	int32 ParticleIndicesNumShorts = 0;
 	uint8* ParticleData = nullptr;
 	uint16* ParticleIndices = nullptr;
+
+	FParticleDataContainer() = default;
+	~FParticleDataContainer() { Free(); }
+	FParticleDataContainer(const FParticleDataContainer&) = delete;
+	FParticleDataContainer& operator=(const FParticleDataContainer&) = delete;
+
+	void Alloc(int32 InParticleDataNumBytes, int32 InParticleIndicesNumShorts)
+	{
+		Free();
+		ParticleDataNumBytes = InParticleDataNumBytes;
+		ParticleIndicesNumShorts = InParticleIndicesNumShorts;
+		// 인덱스가 16바이트 경계에서 시작하도록 데이터 크기를 올림
+		const int32 DataBytesAligned = (ParticleDataNumBytes + 15) & ~15;
+		MemBlockSize = DataBytesAligned + ParticleIndicesNumShorts * static_cast<int32>(sizeof(uint16));
+		if (MemBlockSize <= 0) return;
+
+		ParticleData = static_cast<uint8*>(_aligned_malloc(static_cast<size_t>(MemBlockSize), 16));
+		ParticleIndices = reinterpret_cast<uint16*>(ParticleData + DataBytesAligned);
+	}
+
+	void Free()
+	{
+		_aligned_free(ParticleData);
+		ParticleData = nullptr;
+		ParticleIndices = nullptr;
+		MemBlockSize = ParticleDataNumBytes = ParticleIndicesNumShorts = 0;
+	}
 };
 
 // GPU에서 사용하는 데이터
